@@ -1,5 +1,7 @@
 package git_flow_lab
 
-func main() {
+import "fmt"
 
+func main() {
+	fmt.Println("hello world")
 }
