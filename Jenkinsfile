@@ -28,7 +28,6 @@ spec:
 
     options {
         skipDefaultCheckout(true)
-        timestamps()
     }
 
     stages {
