@@ -83,6 +83,21 @@ spec:
       volumeMounts:
         - name: buildkit-state
           mountPath: /home/user/.local/share/buildkit
+    - name: kubectl
+      image: git-flow-lab-kubectl:v1.36.1
+      imagePullPolicy: Never
+      command:
+        - sleep
+      args:
+        - 99d
+      tty: true
+      resources:
+        requests:
+          cpu: 25m
+          memory: 32Mi
+        limits:
+          cpu: 250m
+          memory: 128Mi
 '''
         }
     }
@@ -170,6 +185,39 @@ spec:
                             '''
                         }
                     }
+                }
+            }
+        }
+
+        stage('Deploy to Kubernetes') {
+            when {
+                branch 'main'
+            }
+            steps {
+                container('kubectl') {
+                    sh '''
+                        set -eu
+
+                        kubectl set image \
+                          deployment/git-flow-lab \
+                          app="$IMAGE_NAME" \
+                          --namespace=git-flow-lab
+
+                        kubectl annotate \
+                          deployment/git-flow-lab \
+                          kubernetes.io/change-cause="Jenkins build $BUILD_NUMBER, commit $IMAGE_TAG" \
+                          --namespace=git-flow-lab \
+                          --overwrite
+
+                        kubectl rollout status \
+                          deployment/git-flow-lab \
+                          --namespace=git-flow-lab \
+                          --timeout=180s
+
+                        kubectl get pods \
+                          --namespace=git-flow-lab \
+                          --output=wide
+                    '''
                 }
             }
         }

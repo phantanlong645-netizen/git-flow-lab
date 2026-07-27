@@ -15,10 +15,12 @@ spec:
       labels:
         app: git-flow-lab
     spec:
+      imagePullSecrets:
+        - name: ghcr-pull-secret
       containers:
         - name: app
-          image: git-flow-lab:v1
-          imagePullPolicy: Never
+          image: ghcr.io/phantanlong645-netizen/git-flow-lab:a8bc533defad
+          imagePullPolicy: IfNotPresent
           ports:
             - name: http
               containerPort: 8080
