@@ -80,11 +80,14 @@ spec:
             steps {
                 container('jnlp') {
                     checkout scm
-                }
-                script {
-                    env.IMAGE_TAG = env.GIT_COMMIT.take(12)
-                    env.IMAGE_NAME = "${env.IMAGE_REPOSITORY}:${env.IMAGE_TAG}"
-                    echo "Image: ${env.IMAGE_NAME}"
+                    script {
+                        env.IMAGE_TAG = sh(
+                            script: 'git rev-parse --short=12 HEAD',
+                            returnStdout: true
+                        ).trim()
+                        env.IMAGE_NAME = "${env.IMAGE_REPOSITORY}:${env.IMAGE_TAG}"
+                        echo "Image: ${env.IMAGE_NAME}"
+                    }
                 }
             }
         }
