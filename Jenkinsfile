@@ -149,24 +149,26 @@ spec:
                             passwordVariable: 'GHCR_TOKEN'
                         )
                     ]) {
-                        sh '''
-                            set -eu
-                            set +x
+                        retry(5) {
+                            sh '''
+                                set -eu
+                                set +x
 
-                            export DOCKER_CONFIG="$WORKSPACE/.docker"
-                            mkdir -p "$DOCKER_CONFIG"
-                            trap 'rm -rf "$DOCKER_CONFIG"' EXIT
+                                export DOCKER_CONFIG="$WORKSPACE/.docker"
+                                mkdir -p "$DOCKER_CONFIG"
+                                trap 'rm -rf "$DOCKER_CONFIG"' EXIT
 
-                            AUTH="$(printf '%s:%s' "$GHCR_USER" "$GHCR_TOKEN" | base64 | tr -d '\\n')"
-                            printf '{"auths":{"ghcr.io":{"auth":"%s"}}}\\n' "$AUTH" > "$DOCKER_CONFIG/config.json"
+                                AUTH="$(printf '%s:%s' "$GHCR_USER" "$GHCR_TOKEN" | base64 | tr -d '\\n')"
+                                printf '{"auths":{"ghcr.io":{"auth":"%s"}}}\\n' "$AUTH" > "$DOCKER_CONFIG/config.json"
 
-                            buildctl-daemonless.sh build \
-                              --frontend dockerfile.v0 \
-                              --local context=. \
-                              --local dockerfile=. \
-                              --opt "build-arg:VERSION=$IMAGE_TAG" \
-                              --output "type=image,name=$IMAGE_NAME,push=true"
-                        '''
+                                buildctl-daemonless.sh build \
+                                  --frontend dockerfile.v0 \
+                                  --local context=. \
+                                  --local dockerfile=. \
+                                  --opt "build-arg:VERSION=$IMAGE_TAG" \
+                                  --output "type=image,name=$IMAGE_NAME,push=true"
+                            '''
+                        }
                     }
                 }
             }
