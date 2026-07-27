@@ -209,10 +209,18 @@ spec:
                           --namespace=git-flow-lab \
                           --overwrite
 
-                        kubectl rollout status \
+                        if ! kubectl rollout status \
                           deployment/git-flow-lab \
                           --namespace=git-flow-lab \
-                          --timeout=180s
+                          --timeout=360s; then
+                            kubectl get pods \
+                              --namespace=git-flow-lab \
+                              --output=wide
+                            kubectl get events \
+                              --namespace=git-flow-lab \
+                              --sort-by=.lastTimestamp
+                            exit 1
+                        fi
 
                         kubectl get pods \
                           --namespace=git-flow-lab \
