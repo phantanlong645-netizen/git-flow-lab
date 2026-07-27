@@ -14,6 +14,13 @@ spec:
     - name: jnlp
       image: jenkins/inbound-agent:3384.v60d89463d9e0-1
       imagePullPolicy: Never
+      env:
+        - name: HTTP_PROXY
+          value: http://http.docker.internal:3128
+        - name: HTTPS_PROXY
+          value: http://http.docker.internal:3128
+        - name: NO_PROXY
+          value: 127.0.0.1,localhost,.svc,.cluster.local
       resources:
         requests:
           cpu: 100m
@@ -28,6 +35,13 @@ spec:
       args:
         - 99d
       tty: true
+      env:
+        - name: HTTP_PROXY
+          value: http://http.docker.internal:3128
+        - name: HTTPS_PROXY
+          value: http://http.docker.internal:3128
+        - name: NO_PROXY
+          value: 127.0.0.1,localhost,.svc,.cluster.local
       resources:
         requests:
           cpu: 50m
@@ -46,6 +60,12 @@ spec:
       env:
         - name: BUILDKITD_FLAGS
           value: --oci-worker-no-process-sandbox
+        - name: HTTP_PROXY
+          value: http://http.docker.internal:3128
+        - name: HTTPS_PROXY
+          value: http://http.docker.internal:3128
+        - name: NO_PROXY
+          value: 127.0.0.1,localhost,.svc,.cluster.local
       securityContext:
         runAsUser: 1000
         runAsGroup: 1000
@@ -79,7 +99,9 @@ spec:
         stage('Checkout') {
             steps {
                 container('jnlp') {
-                    checkout scm
+                    retry(5) {
+                        checkout scm
+                    }
                     script {
                         env.IMAGE_TAG = sh(
                             script: 'git rev-parse --short=12 HEAD',
