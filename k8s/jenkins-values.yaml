@@ -4,15 +4,3 @@ controller:
   containerEnv:
     - name: PATH
       value: /var/jenkins_home/bin:/opt/java/openjdk/bin:/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games
-    - name: HTTP_PROXY
-      value: http://http.docker.internal:3128
-    - name: HTTPS_PROXY
-      value: http://http.docker.internal:3128
-    - name: NO_PROXY
-      value: 127.0.0.1,localhost,.svc,.cluster.local,kubernetes.default.svc
-    - name: http_proxy
-      value: http://http.docker.internal:3128
-    - name: https_proxy
-      value: http://http.docker.internal:3128
-    - name: no_proxy
-      value: 127.0.0.1,localhost,.svc,.cluster.local,kubernetes.default.svc
