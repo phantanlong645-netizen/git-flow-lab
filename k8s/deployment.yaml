@@ -15,12 +15,24 @@ spec:
       labels:
         app: git-flow-lab
     spec:
-      imagePullSecrets:
-        - name: ghcr-pull-secret
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: accelerator
+                    operator: In
+                    values:
+                      - gpu-sim
+      tolerations:
+        - key: dedicated
+          operator: Equal
+          value: gpu
+          effect: NoSchedule
       containers:
         - name: app
-          image: ghcr.io/phantanlong645-netizen/git-flow-lab:a8bc533defad
-          imagePullPolicy: IfNotPresent
+          image: git-flow-lab:local-v1
+          imagePullPolicy: Never
           ports:
             - name: http
               containerPort: 8080
